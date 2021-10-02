@@ -7,7 +7,9 @@ Since then, I have picked up Python and like to put my investment tools on more 
 Use at your own risk—no investment advice.
 
 ## How to run
-Presently the refactoring is focused on the data load and portfolio construction logic. You will need access to Kubernetes (either local minikube or at your preferred cloud provider) to run PySpark and PostgreSQL. Other than that the following should get you started:
+Presently the refactoring is focused on the data load and portfolio construction logic.
+You will need access to Kubernetes (either local minikube or at your preferred cloud provider)
+to run PySpark and PostgreSQL. Other than that the following should get you started:
 
 0. (Optional) create a new conda environment by running ```conda create -n bpt_conda```
 1. Ensure all dependencies are installed ````pip install -r requirements.txt````
@@ -36,8 +38,13 @@ To set up your development environment after cloning the repo please perform the
 I have created [RAutoInvest](https://github.com/ProbStub/RAutoInvest) initially to demonstrate the feasibility of
 automated ETF investments with relatively simple tooling. The objective has been to acquire funding for a
 robo-advisor venture but the project did not succeed.
-There had been discussions to improve the codebase and donate to an investor protection site. The aim has been to screen portfolio proposals for hidden fees. However, life intervened, and I could not go ahead with that project.
-The technology looks outdated years later, but I still find myself needing portfolio tooling and having a bit of time on my hands. Hence, I am picking up this refactoring project as a hobby, applying some tricks acquired over the years. That said, it is a hobby; issue response and commits may be intermittent.
+There had been discussions to improve the codebase and donate to an investor protection site.
+The aim has been to screen portfolio proposals for hidden fees. However, life intervened, and
+I could not go ahead with that project.
+The technology looks outdated years later, but I still find myself needing portfolio
+tooling and having a bit of time on my hands. Hence, I am picking up this refactoring project as a
+hobby, applying some tricks acquired over the years. That said, it is a hobby; issue response and commits may be
+intermittent.
 
 Refactoring will initially focus on the following:
 - Change the data load to PySpark pipelines
@@ -49,4 +56,25 @@ Refactoring will initially focus on the following:
 Later objectives will include:
 - Building a user interface beyond the command line interface
 - Provision broker connectivity facilities
-- Extend construction to current ML facilitated strategies
+- Extend portfolio construction to emerging ML facilitated strategies
+
+## Prerequisite setup
+In the event that you do not yet have a Kubernetes setup with PySpark and Postgres ready, below
+are some very quick steps to get you started.
+The steps may vary on your machine and are by no means complete.
+
+1. Install [Docker](https://www.docker.com) - You may as well create DockerHub account, although not strictly required
+2. Install [Homebrew](https://brew.sh):
+```/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"```
+3. Install PySpark using Homebrew (verify ```.zprofile``` in your home points to
+correct Java/Python paths by comparing with output of ```which python3``` etc.):```brew install apache-spark```
+4. Get the [Zalando Postgres Kubernetes operator](https://postgres-operator.readthedocs.io/en/latest/quickstart/)
+installed
+5. Obtain Postgres host & port and insert into your ```.env``` file (keep the terminal open on macOS):
+```minikube service acid-minimal-cluster --url | sed 's,.*/,,'```
+6. Obtain Postgres password & password for ```.env``` (the <b>username postgres</b> is fixed
+remove, if any, trailing special character:
+```kubectl get secret postgres.acid-minimal-cluster.credentials -o 'jsonpath={.data.password}' | base64 -d```
+7. Create accounts at Google Cloud Platform and MongoDB to install a hosted MongoDB Atlas instance (for free) and
+record the hostname, port, username & password in your ```.env``` file -
+Optionally use the [MongoDB Kubernetes operator](https://www.mongodb.com/try/download/community-kubernetes-operator)
