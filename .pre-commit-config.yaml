@@ -1,0 +1,33 @@
+# BEFORE changing test with: pre-commit run --all-files
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+    -   id: check-yaml
+    -   id: trailing-whitespace
+-   repo: https://github.com/Yelp/detect-secrets
+    rev: v1.1.0
+    hooks:
+    -   id: detect-secrets
+        args: ["scan"]
+-    repo: git://github.com/pycqa/pylint
+     rev: pylint-2.6.0
+     hooks:
+     -   id: pylint
+         args: ["--rcfile=.pylintrc"]
+-   repo: https://github.com/PyCQA/bandit
+    rev: 1.7.0
+    hooks:
+    - id: bandit
+      name: Run bandit security checks
+      exclude: ^test/
+      args:
+        - -s
+        - B101
+#-    repo: local
+#     hooks:
+#     -   id: pytest
+#         name: Run pre-commit unit tests
+#         entry: pytest
+#         language: python
+#         args: [--rcfile=.pylintrc ]
