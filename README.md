@@ -15,21 +15,22 @@ Presently the refactoring is focused on the data load and portfolio construction
 3. Insert your database, cloud and API secrets into the ```.env``` file
 4. Run ````python main.py```` in the repos root directory (this directory)
 
- >NOTE: Presently, input and output file names are defined as ````TBD.FILE```` and ````TBD.FILE````.
+> NOTE: Presently, input and output file names are defined as ````TBD.FILE```` and ````TBD.FILE````.
 
 
 ## How to contribute
 The code is public for a reason, and if you like to contribute, please consider to:
-Provide test_* files for your contribution
-Ensure that linting completes without issues
+- Provide test_* files for your contribution
+- Ensure that linting completes without issues
 
 To set up your development environment after cloning the repo please perform the following preparation steps:
 1. Pre-Commit hooks have been established so please run ````pre-commit install````
 2. PyTests are located in the ```/test``` directory but excluded from pre-commit hooks. Uncomment the testing hook in
    ````.pre-commit-config.yaml```` if you wish to enable pre-commit tests
 3. Very basic linting is configured in ````.pylintrc````, adapt as needed
-4. Secrets can be maintained in Dotenv and ````.gitignore```` is ignoring the file
+4. Secrets can be maintained in ```.env``` and ````.gitignore```` is ignoring that file
 
+> NOTE: pre-commit hooks to trim whitespaces are defined and may fail at the first commit. Check the logs and try again.
 
 ## Some background
 I have created [RAutoInvest](https://github.com/ProbStub/RAutoInvest) initially to demonstrate the feasibility of
