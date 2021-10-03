@@ -1,0 +1,26 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: spark-deployment
+  labels:
+    app: spark-app
+    environment: sandbox
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: spark-app
+      environment: sandbox
+  template:
+    metadata:
+      labels:
+        app: spark-app
+        environment: sandbox
+    spec:
+      containers:
+        - name: spark-container
+          image: spark-py:spark # Ensure image is built for arm on M1 and amd64 for Google/AWS Kubernetes
+          #imagePullPolicy: Never #Image pull MUST be inactive/"Never" for local deployment
+          ports:
+            - containerPort: 8181 # Set to appropriate port for your environment
+      restartPolicy: Always
