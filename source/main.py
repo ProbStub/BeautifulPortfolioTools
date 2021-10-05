@@ -6,6 +6,8 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.types import IntegerType
 
+import FileUtility as fu
+
 def run():
     """
     Program initiation function parsing user parameters, providing help and launching the application
@@ -39,6 +41,18 @@ def run():
         .option("password", pg_pwd) \
         .mode("append") \
         .save()
+    # Prepare and load input (from file storage)
+    # TODO: replace local file load with Kaggle -> GCS -> load implementation for test runs
+    raw_df = fu.load_file("/opt/data/ETFs.csv", spark)
+    # TODO: Configuration of Pipeline Builder for ETF load
+    # TODO: Execute PipelineRunner for ETFs
+    # Prepare and safe output (to mongodb, instruments and market data are evolving schema)
+
+    # Prepare and load input (from mongodb)
+    # TODO: Configure and Execute Pipeline* for portfolio building (excl. Investment Policy Statement)
+    # Prepare and load input (from mongodb and postgres, IPS and user data are fixed schema)
+    # TODO: Configure and Execute Pipeline* for portfolio building (incl. Investment Policy Statement constraints)
+    # Prepare and safe output
 
     print("...closing down")
 
