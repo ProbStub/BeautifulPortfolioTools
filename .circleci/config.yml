@@ -11,8 +11,20 @@ jobs:
       - checkout
       # TODO: Create build environment
       # - run: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  test:
+    description: WIP - Prep test data and execute pyTest
+    docker:
+      - image: cimg/base:2021.07
+    steps:
+      - checkout
+    # TODO: Run tests 
   deploy:
     description: WIP - Create build environment
+    docker:
+      - image: cimg/base:2021.07
+    steps:
+      - checkout
+    # TODO: Run deployment    
 
 workflows:
   production_deploy:
