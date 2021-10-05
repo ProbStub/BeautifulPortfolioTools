@@ -1,0 +1,54 @@
+version: 2.1
+orbs:
+  gcr: circleci/gcp-gcr@0.0.2
+  gke: circleci/gcp-gke@0.2.0
+jobs:
+  build:
+    description: WIP - Create build environment
+    docker:
+      - image: cimg/base:2021.07
+    steps:
+      - checkout
+      # TODO: Create build environment
+      # - run: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  deploy:
+    description: WIP - Create build environment
+
+workflows:
+  production_deploy:
+    jobs:
+      - build:
+          name: WIP - Build
+          filters:
+            branches:
+              only:
+                - master
+      - test:
+          name: WIP - Test
+          filters:
+            branches:
+              only:
+                - master
+      - deploy:
+          name: WIP - Deploy
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - "WIP - Build"
+            - "WIP - Test"
+  integration_test:
+    jobs:
+      - build:
+          name: WIP - Build
+          filters:
+            branches:
+              only:
+                - integration
+      - test:
+          name: WIP - Test
+          filters:
+            branches:
+              only:
+                - integration

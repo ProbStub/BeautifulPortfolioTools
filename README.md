@@ -17,8 +17,8 @@ to run PySpark and PostgreSQL. Other than that the following should get you star
 3. Insert your database, cloud and API secrets into the ```.env``` file
 4. Run ````python main.py```` in the repos root directory (this directory)
 
-> NOTE: Presently, input and output file names are defined as ````TBD.FILE```` and ````TBD.FILE````.
-
+If you need more detailed instructions have a look at the [manifest README](manifests/README.md)
+which walks through some steps in more details (but is presently work in progress).
 
 ## How to contribute
 The code is public for a reason, and if you like to contribute, please consider to:
@@ -57,24 +57,3 @@ Later objectives will include:
 - Building a user interface beyond the command line interface
 - Provision broker connectivity facilities
 - Extend portfolio construction to emerging ML facilitated strategies
-
-## Prerequisite setup
-In the event that you do not yet have a Kubernetes setup with PySpark and Postgres ready, below
-are some very quick steps to get you started.
-The steps may vary on your machine and are by no means complete.
-
-1. Install [Docker](https://www.docker.com) - You may as well create DockerHub account, although not strictly required
-2. Install [Homebrew](https://brew.sh):
-```/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"```
-3. Install PySpark using Homebrew (verify ```.zprofile``` in your home points to
-correct Java/Python paths by comparing with output of ```which python3``` etc.):```brew install apache-spark```
-4. Get the [Zalando Postgres Kubernetes operator](https://postgres-operator.readthedocs.io/en/latest/quickstart/)
-installed
-5. Obtain Postgres host & port and insert into your ```.env``` file (keep the terminal open on macOS):
-```minikube service acid-minimal-cluster --url | sed 's,.*/,,'```
-6. Obtain Postgres password & password for ```.env``` (the <b>username postgres</b> is fixed
-remove, if any, trailing special character:
-```kubectl get secret postgres.acid-minimal-cluster.credentials -o 'jsonpath={.data.password}' | base64 -d```
-7. Create accounts at Google Cloud Platform and MongoDB to install a hosted MongoDB Atlas instance (for free) and
-record the hostname, port, username & password in your ```.env``` file -
-Optionally use the [MongoDB Kubernetes operator](https://www.mongodb.com/try/download/community-kubernetes-operator)

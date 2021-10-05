@@ -1,26 +1,130 @@
-kind: Deployment
+# TODO: Add GCS and Ingress for CI/CD GKE hosting
 apiVersion: apps/v1
+kind: Deployment
 metadata:
+  namespace: spark
   name: spark-deployment
   labels:
-    app: spark-app
+    app: BeautifulPortfolioTools
     environment: sandbox
+    component: spark-driver
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: spark-app
+      app: BeautifulPortfolioTools
       environment: sandbox
+      component: spark-driver
   template:
     metadata:
       labels:
-        app: spark-app
+        app: BeautifulPortfolioTools
         environment: sandbox
+        component: spark-driver
     spec:
+      serviceAccountName: spark
       containers:
-        - name: spark-container
-          image: spark-py:spark # Ensure image is built for arm on M1 and amd64 for Google/AWS Kubernetes
-          #imagePullPolicy: Never #Image pull MUST be inactive/"Never" for local deployment
-          ports:
-            - containerPort: 8181 # Set to appropriate port for your environment
-      restartPolicy: Always
+      # TODO: change to non-jupyter image and run: "spark-class org.apache.spark.deploy.master.Master"
+      - name: spark-driver-container
+        image: localhost:5000/jupyter/pyspark-notebook # Set to appropriate image registry, name and tag
+        ports:
+          - name: driver
+            containerPort: 4000 # Ensure image is built for arm on M1 and amd64 for Google/AWS Kubernetes
+          - name: blockmanager
+            containerPort: 4001 # Ensure image is built for arm on M1 and amd64 for Google/AWS Kubernetes
+          - name: jupyter
+            containerPort: 8888 # Ensure image is built for arm on M1 and amd64 for Google/AWS Kubernetes
+        volumeMounts:
+          - mountPath: /home/jovyan/local_data
+            name: spark-driver-pv
+        workingDir: /home/jovyan
+        resources:
+          limits:
+            memory: 1Gi
+      initContainers:
+        - name: spark-driver-permission-setting
+          image: alpine:3
+          # Give `jovyan` user (id 1000) permissions a mounted volume
+          command:
+            - chown
+            - -R
+            - 1000:1000
+            - /home/jovyan/local_data
+          volumeMounts:
+            - mountPath: /home/jovyan/local_data
+              name: spark-driver-pv
+      volumes:
+        - name: spark-driver-pv
+          persistentVolumeClaim:
+            claimName: spark-driver-claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: spark
+  name: spark-driver-claim
+spec:
+  storageClassName: local
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5G
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  namespace: spark
+  name: local-storage-volume
+  labels:
+    app: BeautifulPortfolioTools
+    environment: sandbox
+    component: storage
+spec:
+  storageClassName: local
+  capacity:
+    storage: 10G
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /opt/data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: spark
+  name: spark-deployment-tcp-service
+  labels:
+    app: BeautifulPortfolioTools
+    environment: sandbox
+    component: spark-driver
+spec:
+  selector:
+    app: BeautifulPortfolioTools
+    environment: sandbox
+  ports:
+    - protocol: TCP
+      port: 29413 # Set to appropriate port for your environment
+  clusterIP: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: spark
+  name: spark-deployment-cip-service
+  labels:
+    app: BeautifulPortfolioTools
+    environment: sandbox
+    component: spark-driver
+spec:
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 4000 # Set to appropriate port for your environment
+      name: driver
+    - protocol: TCP
+      port: 4001 # Set to appropriate port for your environment
+      name: block-manager
+    - protocol: TCP
+      port: 8888 # Set to appropriate port for your environment
+      name: jupyter
