@@ -1,4 +1,5 @@
 # TODO: Add GCS and Ingress for CI/CD GKE hosting
+# TODO: If done, remember to split into separate files and enable the YAML check in pre-commit-config again
 apiVersion: apps/v1
 kind: Deployment
 metadata:
