@@ -17,14 +17,14 @@ jobs:
       - image: cimg/base:2021.07
     steps:
       - checkout
-    # TODO: Run tests 
+    # TODO: Run test
   deploy:
     description: WIP - Create build environment
     docker:
       - image: cimg/base:2021.07
     steps:
       - checkout
-    # TODO: Run deployment    
+    # TODO: Run deployment
 
 workflows:
   production_deploy:
