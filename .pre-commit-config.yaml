@@ -3,7 +3,7 @@ repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.3.0
     hooks:
-    -   id: check-yaml
+    #-   id: check-yaml # TODO: Enable after manifest refactoring completes
     -   id: trailing-whitespace
 -   repo: https://github.com/Yelp/detect-secrets
     rev: v1.1.0
