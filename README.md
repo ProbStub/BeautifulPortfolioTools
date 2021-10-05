@@ -6,6 +6,11 @@ an abandoned attempt at a robo-advisor venture six years ago.
 Since then, I have picked up Python and like to put my investment tools on more solid grounds.
 Use at your own risk—no investment advice.
 
+Importantly each tool performs one activity only (e.g., load data, compute future returns, compute weights, etc.),
+Combining each tool with UNIX pipes should allow for more complex portfolio construction tasks.
+If this is not immediately appealing, you may always run the "main"" tool and specify tasks with
+command line flags and options (or eventually interactive UI).
+
 ## How to run
 Presently the refactoring is focused on the data load and portfolio construction logic.
 You will need access to Kubernetes (either local minikube or at your preferred cloud provider)
@@ -15,7 +20,9 @@ to run PySpark and PostgreSQL. Other than that the following should get you star
 1. Ensure all dependencies are installed ````pip install -r requirements.txt````
 2. PySpark needs to be installed locally for code to execute
 3. Insert your database, cloud and API secrets into the ```.env``` file
-4. Run ````python main.py```` in the repos root directory (this directory)
+4. Run each tool with a separate python call such as
+    ````python source/main.py```` where "main" can be replaced with any of the tools
+in the repos root directory (this directory)
 
 If you need more detailed instructions have a look at the [manifest README](manifests/README.md)
 which walks through some steps in more details (but is presently work in progress).
@@ -57,3 +64,25 @@ Later objectives will include:
 - Building a user interface beyond the command line interface
 - Provision broker connectivity facilities
 - Extend portfolio construction to emerging ML facilitated strategies
+
+### Why only one activity with each tool?
+
+Over the years I have seen many complex convoluted code or data structures. As a
+user I was more than once unable to use a nice tool because it seemed to have more options
+than a cat has hairs. I want to empower regular people to build investment portfolios
+for themselves. If not to implement for investment purpose but to challenge and verify
+advise and offers from professional advisors. The asymmetric information in investment
+advisory more often than not leads to an unhappy outcome.
+
+Long story short: One task at a time is far better to understand than multiple.
+
+A secondary objective is to allow single tasks to be combined into more complex scenarios. Very basic
+UNIX commands such as ```sed``` and ```ls``` are frequently combined to do much more
+complex operations. Each command expects specific inputs and outputs and does one operation.
+When processing large amounts of investment data that is advisable as well. When predicting
+future returns on two separate markets you should be able to do that without waiting for the
+whole process of data load, forecasting, portfolio construction and output generation.
+All you want is the forecast.
+
+
+
