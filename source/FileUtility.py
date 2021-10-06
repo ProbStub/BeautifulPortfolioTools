@@ -22,7 +22,7 @@ def load_file(file_name, spark_session):
     """
 
     _allowed_ft = ["csv"]
-    _allowed_cd = ["utf-8"]
+    _allowed_cd = ["utf-8", "ascii"]
 
     spark = spark_session
 
