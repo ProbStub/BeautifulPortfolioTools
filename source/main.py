@@ -7,6 +7,8 @@ from pyspark.sql import functions as F
 from pyspark.sql.types import IntegerType
 
 import FileUtility as fu
+from PipelineBuilderLoad import PipelineBuilderLoad
+
 
 def run():
     """
@@ -32,21 +34,22 @@ def run():
 
     spark = __start_mongo_spark__(mongo_host, mongo_user, mongo_pwd)
 
-    df_mdb = spark.read.format("mongo").load()
-    df_pg = df_mdb.select("_c0","_c9").withColumn("id",F.col("_c0").cast(IntegerType())).withColumnRenamed("_c9","content").drop(F.col("_c0"))
-    df_pg.write \
-        .format("jdbc") \
-        .option("url", "jdbc:postgresql://" + pg_host + "/spark_mongo") \
-        .option("driver", "org.postgresql.Driver") \
-        .option("dbtable", "input.objects") \
-        .option("user", "postgres") \
-        .option("password", pg_pwd) \
-        .mode("append") \
-        .save()
+    # df_mdb = spark.read.format("mongo").load()
+    # df_pg = df_mdb.select("_c0","_c9").withColumn("id",F.col("_c0").cast(IntegerType())).withColumnRenamed("_c9","content").drop(F.col("_c0"))
+    # df_pg.write \
+    #     .format("jdbc") \
+    #     .option("url", "jdbc:postgresql://" + pg_host + "/spark_mongo") \
+    #     .option("driver", "org.postgresql.Driver") \
+    #     .option("dbtable", "input.objects") \
+    #     .option("user", "postgres") \
+    #     .option("password", pg_pwd) \
+    #     .mode("append") \
+    #     .save()
     # Prepare and load input (from file storage)
     # TODO: replace local file load with Kaggle -> GCS -> load implementation for test runs
     raw_df = fu.load_file("/opt/data/ETFs.csv", spark)
     # TODO: Configuration of Pipeline Builder for ETF load
+    load_pipe = PipelineBuilderLoad(input_df=raw_df, auto_schema=True, auto_correct=True)
     # TODO: Execute PipelineRunner for ETFs
     # Prepare and safe output (to mongodb, instruments and market data are evolving schema)
 

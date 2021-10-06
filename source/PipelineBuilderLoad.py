@@ -13,27 +13,34 @@ class PipelineBuilderLoad(PipelineBuilder):
 
     # TODO: Manage property exposure once class design completes
 
-    def __init__(self, auto_schema, auto_correct, custom_tf=None, custom_params=None):
+    def __init__(self, input_df, auto_schema, auto_correct, custom_tf=[], custom_params=[]):
         """
         Create a pipeline builder either with automatic schema inference and imputation/correction
         enabled or a defines set of transformers to be executed.
 
         Args:
+            input_df: Spark dataframe
             auto_schema: Set to True in case automatic schema inference is required, False otherwise
             auto_correct: Set to True in case automatic schema inference is required, False otherwise
-            custom_tra: Dict with an instance of the SparkML custom transformer and a
-                        dict for the transformer parameters, eg.
-                        {myStringDecimalTransformer: {myStringDecimalTransformer.removeTokens: "'",
-                                                      myStringDecimalTransformer.decSplitStr: "."}}
+            List of dicts with transformer parameters such as
+                            {myStringDecimalTransformer.removeTokens: "'",
+                             myStringDecimalTransformer.decSplitStr: "."}}
         """
+
         if auto_schema:
             # TODO: coordinate Transformers for schema inference, then add to custom_tf and custom_params
-            custom_tf.append(None)
+            if len(custom_tf) > 1:
+                custom_tf.append([])
+            if len(custom_params) > 1:
+                custom_params.append([])
         if auto_correct:
             # TODO: coordinate Transformers for cleaning, then add to custom_tf and custom_params
-            custom_tf.append(None)
+            if len(custom_tf) > 1:
+                custom_tf.append([])
+            if len(custom_params) > 1:
+                custom_params.append([])
+
         # build and fit the pipleline
-        super().__init__(self,
-                         custom_tf,
-                         custom_tf,
-                         custom_params)
+        super().__init__(input_df=input_df,
+                         custom_tf=custom_tf,
+                         custom_params=custom_params)
