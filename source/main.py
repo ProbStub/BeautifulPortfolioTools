@@ -20,6 +20,8 @@ def run():
 
     print("Initiating...")
     load_dotenv()
+
+    # TODO: Pre-Release remove mongod DB dependency!!
     mongo_host = os.getenv("MONGO_HOST")
     mongo_user = os.getenv("MONGO_USER")
     mongo_pwd = os.getenv("MONGO_PWD")
