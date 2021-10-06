@@ -1,3 +1,5 @@
+from pyspark.ml import Pipeline
+
 from PipelineBuilder import PipelineBuilder
 
 
@@ -9,7 +11,9 @@ class PipelineBuilderLoad(PipelineBuilder):
     dataframe
     """
 
-    def __init__(self, auto_schema, auto_correct, custom_tra=None):
+    # TODO: Manage property exposure once class design completes
+
+    def __init__(self, auto_schema, auto_correct, custom_tf=None, custom_params=None):
         """
         Create a pipeline builder either with automatic schema inference and imputation/correction
         enabled or a defines set of transformers to be executed.
@@ -22,4 +26,14 @@ class PipelineBuilderLoad(PipelineBuilder):
                         {myStringDecimalTransformer: {myStringDecimalTransformer.removeTokens: "'",
                                                       myStringDecimalTransformer.decSplitStr: "."}}
         """
-        super().__init__(self, custom_tra)
+        if auto_schema:
+            # TODO: coordinate Transformers for schema inference, then add to custom_tf and custom_params
+            custom_tf.append(None)
+        if auto_correct:
+            # TODO: coordinate Transformers for cleaning, then add to custom_tf and custom_params
+            custom_tf.append(None)
+        # build and fit the pipleline
+        super().__init__(self,
+                         custom_tf,
+                         custom_tf,
+                         custom_params)

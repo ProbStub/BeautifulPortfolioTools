@@ -1,21 +1,27 @@
+from pyspark.ml import Pipeline
+
 class PipelineBuilder():
     """
     Builds a SparkML pipeline according to user instructions, applying
     custom transforms as required
     """
 
-    def __init__(self, custom_tf=None):
+    # TODO: Manage property exposure once class design completes
+
+    def __init__(self, input_df, custom_tf=None, custom_params=None):
         """
-        Create a pipeline builder
+        Create a fit()ed pipeline including the selected transformers and parameters
 
         Args:
-            custom_tf: Dict with an instance of the SparkML custom transformer and a
-                        dict for the transformer parameters, eg.
-                        {myStringDecimalTransformer: {myStringDecimalTransformer.removeTokens: "'",
-                                                      myStringDecimalTransformer.decSplitStr: "."}}
-        Raises:
-            ValueError: If custom_tf does not contain instances to prevent zip() from overwriting named parameters
+            custom_tf: List of transformer instances
+            custom_params: List of dicts with transformer parameters
+
         """
 
-        transformers, params = zip(*custom_tf.items())
-        transformers = list(transformers)
+        if custom_tf is not None or custom_params is not None:
+            self.transformers = custom_tf
+            self.params = custom_params
+            self.pipeline = Pipeline(stages=[self.transformers]).fit(input_df, self.params)
+        else:
+            # Composing empty instance to retain pipeline facilities get/setParams for manual setting
+            self.pipeline = Pipeline()
