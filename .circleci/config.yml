@@ -3,6 +3,9 @@ orbs:
   gcr: circleci/gcp-gcr@0.0.2
   gke: circleci/gcp-gke@0.2.0
 jobs:
+  # TODO: Add logging and monitoring tests
+  # TODO: Add custom test loads for test-driven model development/evaluation
+  # TODO: Check "special" branches against "special" tests, eg. yahoo source vs morningstar sourced
   build:
     description: WIP - Create build environment
     docker:

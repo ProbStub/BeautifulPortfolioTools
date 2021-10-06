@@ -87,6 +87,7 @@ def __start_mongo_spark__(mongo_host, mongo_user, mongo_pwd):
         # Note: MongoDB Atlas -> mongodb+srv and no ports! Using mongo-spark connector 3.0.1
         # verify package JARs download to cluster nodes -> check logs for :: resolving dependencies ::
         # Also DB=sample_analytics, Collection=Customers
+        # TODO: Enable logging "spark.eventLog.enabled true" and decide on mondgodb vs GCS log storage
         conf = pyspark.SparkConf()
         conf.set("spark.jars.packages",
                  "org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.postgresql:postgresql:42.2.22")
