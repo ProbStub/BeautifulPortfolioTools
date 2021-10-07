@@ -13,19 +13,20 @@ class PipelineBuilderLoad(PipelineBuilder):
 
     # TODO: Manage property exposure once class design completes
 
-    def __init__(self, input_df, auto_schema, auto_correct, custom_tf=[], custom_params=[]):
+    def __init__(self, auto_schema, auto_correct, custom_tf=[], custom_params=[]):
         """
         Create a pipeline builder either with automatic schema inference and imputation/correction
         enabled or a defines set of transformers to be executed.
 
         Args:
-            input_df: Spark dataframe
             auto_schema: Set to True in case automatic schema inference is required, False otherwise
             auto_correct: Set to True in case automatic schema inference is required, False otherwise
             List of dicts with transformer parameters such as
                             {myStringDecimalTransformer.removeTokens: "'",
                              myStringDecimalTransformer.decSplitStr: "."}}
         """
+
+        # TODO: Clean up this constructor and remove actions on data and ensure all object attributes are set...
 
         if auto_schema:
             # TODO: coordinate Transformers for schema inference, then add to custom_tf and custom_params
@@ -41,6 +42,5 @@ class PipelineBuilderLoad(PipelineBuilder):
                 custom_params.append([])
 
         # build and fit the pipleline
-        super().__init__(input_df=input_df,
-                         custom_tf=custom_tf,
+        super().__init__(custom_tf=custom_tf,
                          custom_params=custom_params)
