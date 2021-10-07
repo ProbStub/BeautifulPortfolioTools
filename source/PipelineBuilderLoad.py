@@ -1,5 +1,4 @@
-from pyspark.ml import Pipeline
-
+from CustomTransformers import StringDecimalTransformer
 from PipelineBuilder import PipelineBuilder
 
 
@@ -13,34 +12,52 @@ class PipelineBuilderLoad(PipelineBuilder):
 
     # TODO: Manage property exposure once class design completes
 
-    def __init__(self, input_df, auto_schema, auto_correct, custom_tf=[], custom_params=[]):
+    def __init__(self, auto_schema, auto_correct, custom_tf=[], custom_params=[]):
         """
         Create a pipeline builder either with automatic schema inference and imputation/correction
         enabled or a defines set of transformers to be executed.
 
         Args:
-            input_df: Spark dataframe
             auto_schema: Set to True in case automatic schema inference is required, False otherwise
             auto_correct: Set to True in case automatic schema inference is required, False otherwise
             List of dicts with transformer parameters such as
                             {myStringDecimalTransformer.removeTokens: "'",
                              myStringDecimalTransformer.decSplitStr: "."}}
         """
+        super().__init__()
 
-        if auto_schema:
+        self.auto_schema = auto_schema
+        self.auto_correct = auto_correct
+
+        self.transformers = custom_tf
+        self.params = custom_params
+
+        if self.auto_schema:
             # TODO: coordinate Transformers for schema inference, then add to custom_tf and custom_params
-            if len(custom_tf) > 1:
-                custom_tf.append([])
-            if len(custom_params) > 1:
-                custom_params.append([])
-        if auto_correct:
-            # TODO: coordinate Transformers for cleaning, then add to custom_tf and custom_params
-            if len(custom_tf) > 1:
-                custom_tf.append([])
-            if len(custom_params) > 1:
-                custom_params.append([])
+            sdt = StringDecimalTransformer(inputCol = "_c0",
+                  outputCol = " _t0",
+                  removeTokens = "'",
+                  decSplitStr = ".",
+                  precision = 10,
+                  scale = 4)
+            if len(self.transformers) >= 1:
+                self.transformers.append(sdt)
+            else:
+                self.transformers = [sdt]
+            if len(self.params) >= 1:
+                self.params.append(sdt.extractParamMap())
+            else:
+                self.params = [sdt.extractParamMap()]
 
-        # build and fit the pipleline
-        super().__init__(input_df=input_df,
-                         custom_tf=custom_tf,
-                         custom_params=custom_params)
+        if self.auto_correct:
+            # TODO: coordinate Transformers for cleaning, then add to custom_tf and custom_params
+            if len(self.transformers) >= 1:
+                self.transformers.append("TransformerX")
+            else:
+                self.transformers = "TransformerX"
+            if len(self.params) >= 1:
+                self.params.append("ParamsX")
+            else:
+                self.params = "ParamsX"
+
+

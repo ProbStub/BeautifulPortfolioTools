@@ -8,6 +8,7 @@ from pyspark.sql.types import IntegerType
 
 import FileUtility as fu
 from PipelineBuilderLoad import PipelineBuilderLoad
+from PipelineRunner import PipelineRunner
 
 
 def run():
@@ -49,8 +50,12 @@ def run():
     # TODO: replace local file load with Kaggle -> GCS -> load implementation for test runs
     raw_df = fu.load_file("/opt/data/ETFs.csv", spark)
     # TODO: Configuration of Pipeline Builder for ETF load
-    load_pipe = PipelineBuilderLoad(input_df=raw_df, auto_schema=True, auto_correct=True)
+    load_pipe = PipelineBuilderLoad(auto_schema=True, auto_correct=False)
+    load_run = PipelineRunner(raw_df, spark, [load_pipe])
+
     # TODO: Execute PipelineRunner for ETFs
+    load_df = load_run.execute()
+
     # Prepare and safe output (to mongodb, instruments and market data are evolving schema)
 
     # Prepare and load input (from mongodb)
@@ -87,6 +92,8 @@ def __start_mongo_spark__(mongo_host, mongo_user, mongo_pwd):
         # Note: MongoDB Atlas -> mongodb+srv and no ports! Using mongo-spark connector 3.0.1
         # verify package JARs download to cluster nodes -> check logs for :: resolving dependencies ::
         # Also DB=sample_analytics, Collection=Customers
+        # TODO: move package choice to PipelineRunner (a load pipeline may not need mongodb without logging)
+        # TODO: Enable Dynamic Allocation
         conf = pyspark.SparkConf()
         conf.set("spark.jars.packages",
                  "org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.postgresql:postgresql:42.2.22")
