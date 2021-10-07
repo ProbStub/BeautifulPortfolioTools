@@ -239,7 +239,7 @@ class StringDecimalTransformer(Transformer, HasInputCol, HasOutputCol):
         # set Parameter objects
         self.removeTokens = Param(self,
                                   "removeTokens",
-                                  "A list of string tokens to remove from the numbers, e.g., thousands indicators.")
+                                  "A list of string tokens to remove, if one use [char], e.g., thousands indicators.")
         self._setDefault(removeTokens=[None])
         self.decSplitStr = Param(self,
                                  "decSplitStr",

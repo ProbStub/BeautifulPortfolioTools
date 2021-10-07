@@ -33,6 +33,8 @@ def run():
     pg_user = os.getenv("PG_USER")
     pg_pwd = os.getenv("PG_PWD")
 
+    local_data_path = os.getenv("LOCAL_DATA_PATH")
+
     spark = __start_mongo_spark__(mongo_host, mongo_user, mongo_pwd)
 
     # df_mdb = spark.read.format("mongo").load()
@@ -48,7 +50,7 @@ def run():
     #     .save()
     # Prepare and load input (from file storage)
     # TODO: replace local file load with Kaggle -> GCS -> load implementation for test runs
-    raw_df = fu.load_file("/opt/data/ETFs.csv", spark)
+    raw_df = fu.load_file(local_data_path+"ETFs.csv", spark)
     # TODO: Configuration of Pipeline Builder for ETF load
     load_pipe = PipelineBuilderLoad(auto_schema=True, auto_correct=False)
     load_run = PipelineRunner(raw_df, spark, [load_pipe])

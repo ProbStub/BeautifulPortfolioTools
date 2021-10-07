@@ -36,7 +36,7 @@ class PipelineBuilderLoad(PipelineBuilder):
             # TODO: coordinate Transformers for schema inference, then add to custom_tf and custom_params
             sdt = StringDecimalTransformer(inputCol = "_c0",
                   outputCol = " _t0",
-                  removeTokens = "'",
+                  removeTokens = ["'"],
                   decSplitStr = ".",
                   precision = 10,
                   scale = 4)
