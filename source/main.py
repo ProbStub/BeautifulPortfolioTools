@@ -8,6 +8,7 @@ from pyspark.sql.types import IntegerType
 
 import FileUtility as fu
 from PipelineBuilderLoad import PipelineBuilderLoad
+from PipelineRunner import PipelineRunner
 
 
 def run():
@@ -49,8 +50,12 @@ def run():
     # TODO: replace local file load with Kaggle -> GCS -> load implementation for test runs
     raw_df = fu.load_file("/opt/data/ETFs.csv", spark)
     # TODO: Configuration of Pipeline Builder for ETF load
-    load_pipe = PipelineBuilderLoad(auto_schema=True, auto_correct=True)
+    load_pipe = PipelineBuilderLoad(auto_schema=True, auto_correct=False)
+    load_run = PipelineRunner(raw_df, spark, [load_pipe])
+
     # TODO: Execute PipelineRunner for ETFs
+    load_df = load_run.execute()
+
     # Prepare and safe output (to mongodb, instruments and market data are evolving schema)
 
     # Prepare and load input (from mongodb)
