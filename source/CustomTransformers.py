@@ -1,13 +1,13 @@
-import sys
 from pyspark import keyword_only
 import pyspark.sql.functions as F
 from pyspark.sql import DataFrame
-from pyspark.sql.types import ArrayType, StringType, IntegerType, DecimalType
+from pyspark.sql.types import StringType, DecimalType
 from pyspark.ml import Transformer
 from pyspark.ml.param.shared import HasInputCol, HasOutputCol, Param
 
 
 class ValueMappingTransformer(Transformer, HasInputCol, HasOutputCol):
+
     """
     Maps the key values on inputCol to values in the mapDict
     """
@@ -130,7 +130,8 @@ class TitleFoldTransformer(Transformer, HasInputCol, HasOutputCol):
         kwargs = self._input_kwargs
         return self._set(**kwargs)
 
-    def _contains_number(self, in_str: str) -> str:
+    @staticmethod
+    def _contains_number(in_str: str) -> str:
         """
         Checks a single string of any length for any digit.
 
@@ -168,7 +169,7 @@ class TitleFoldTransformer(Transformer, HasInputCol, HasOutputCol):
             in_value_list = in_value.split(str_sep)
             out_value = ""
 
-            # TODO: Needs good testing!!!
+            # TODO: Needs good testing; var is only assigne dif if-statements completed as expected!!!
             for item in in_value_list:
                 done = False
                 if in_value_list[-1] == item:
@@ -314,9 +315,6 @@ class StringDecimalTransformer(Transformer, HasInputCol, HasOutputCol):
         return return_val
 
     def _trans_func(self, in_value: str) -> str:
-        # Get the specified tokens to remove and the split string
-        remove_tokens = self.getRemoveTokens()
-        dec_split_str = self.getDecSplitStr()
 
         clean_in_value = self._num_formater(str(in_value))
 
