@@ -1,5 +1,6 @@
 from FileUtility import __get_type__, __get_encoding__
 
+
 class TestFileUtility:
     def test_load_file(self):
         assert True

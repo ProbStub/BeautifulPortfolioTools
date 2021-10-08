@@ -3,8 +3,6 @@ from dotenv import load_dotenv
 
 import pyspark
 from pyspark.sql import SparkSession
-from pyspark.sql import functions as F
-from pyspark.sql.types import IntegerType
 
 import FileUtility as fu
 from PipelineBuilderLoad import PipelineBuilderLoad
@@ -20,22 +18,25 @@ def run():
 
     """
     # TODO: Add user parameter parsing and basic help output
-
     print("Initiating...")
     load_dotenv()
 
-    # TODO: Pre-Release remove mongod DB dependency!!
-    mongo_host = os.getenv("MONGO_HOST")
-    mongo_user = os.getenv("MONGO_USER")
-    mongo_pwd = os.getenv("MONGO_PWD")
-
-    pg_host = os.getenv("PG_HOST")
-    pg_user = os.getenv("PG_USER")
-    pg_pwd = os.getenv("PG_PWD")
-
     local_data_path = os.getenv("LOCAL_DATA_PATH")
 
-    spark = __start_mongo_spark__(mongo_host, mongo_user, mongo_pwd)
+    spark = __start_plain_spark__()
+
+    # TODO: Pre-Release remove mongod DB dependency and refactor spark initialization to PipelineRun or own class!!
+    # mongo_host = os.getenv("MONGO_HOST")
+    # mongo_user = os.getenv("MONGO_USER")
+    # mongo_pwd = os.getenv("MONGO_PWD")
+    #
+    # pg_host = os.getenv("PG_HOST")
+    # pg_user = os.getenv("PG_USER")
+    # pg_pwd = os.getenv("PG_PWD")
+    #
+
+    #
+    # spark = __start_mongo_spark__(mongo_host, mongo_user, mongo_pwd)
 
     # df_mdb = spark.read.format("mongo").load()
     # df_pg = df_mdb.select("_c0","_c9").withColumn("id",F.col("_c0").cast(IntegerType())).withColumnRenamed("_c9","content").drop(F.col("_c0"))
@@ -51,12 +52,13 @@ def run():
     # Prepare and load input (from file storage)
     # TODO: replace local file load with Kaggle -> GCS -> load implementation for test runs
     raw_df = fu.load_file(local_data_path+"ETFs.csv", spark)
-    # TODO: Configuration of Pipeline Builder for ETF load
+    # Configuration of Pipeline Builder for ETF load
     load_pipe = PipelineBuilderLoad(auto_schema=True, auto_correct=False)
     load_run = PipelineRunner(raw_df, spark, [load_pipe])
 
-    # TODO: Execute PipelineRunner for ETFs
+    # Execute PipelineRunner for ETFs
     load_df = load_run.execute()
+    load_df.show()
 
     # Prepare and safe output (to mongodb, instruments and market data are evolving schema)
 
@@ -67,6 +69,7 @@ def run():
     # Prepare and safe output
 
     print("...closing down")
+
 
 def __start_plain_spark__():
     """
@@ -87,6 +90,7 @@ def __start_plain_spark__():
 
     return spark
 
+
 def __start_mongo_spark__(mongo_host, mongo_user, mongo_pwd):
     if mongo_host is None or mongo_user is None or mongo_pwd is None:
         raise RuntimeError("Cannot start MongoDB connection due to missing connection/login credentials.")
@@ -101,7 +105,7 @@ def __start_mongo_spark__(mongo_host, mongo_user, mongo_pwd):
                  "org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.postgresql:postgresql:42.2.22")
         conf.set("spark.mongodb.input.uri", "mongodb+srv://" \
                  + mongo_user + ":" + mongo_pwd + "@" + mongo_host+"/csv_load.acquisitions")
-        conf.set("spark.mongodb.output.uri","mongodb+srv://" \
+        conf.set("spark.mongodb.output.uri", "mongodb+srv://" \
                  + mongo_user + ":" + mongo_pwd + "@" + mongo_host+"/csv_load.acquisitions")
 
         spark = pyspark.sql.SparkSession.builder \
@@ -110,6 +114,7 @@ def __start_mongo_spark__(mongo_host, mongo_user, mongo_pwd):
             .getOrCreate()
 
     return spark
+
 
 def __start_postgres_spark__(pg_host, pg_user, pg_pwd):
     if pg_host is None or pg_user is None or pg_pwd is None:

@@ -3,16 +3,14 @@ from PipelineBuilder import PipelineBuilder
 
 
 class PipelineBuilderLoad(PipelineBuilder):
+
     """
-    Builds a SparkML data loading pipeline according to user instructions, applying
+    Builds a SparkML data loading pipeline according to user instructions, creating
     custom transforms as required (e.g., fully automated schema and type
-    inference or choosing imputation methods) by inspection of a Spark
-    dataframe
+    inference or choosing imputation methods)
     """
-
     # TODO: Manage property exposure once class design completes
-
-    def __init__(self, auto_schema, auto_correct, custom_tf=[], custom_params=[]):
+    def __init__(self, auto_schema, auto_correct, custom_tf=None, custom_params=None):
         """
         Create a pipeline builder either with automatic schema inference and imputation/correction
         enabled or a defines set of transformers to be executed.
@@ -20,12 +18,17 @@ class PipelineBuilderLoad(PipelineBuilder):
         Args:
             auto_schema: Set to True in case automatic schema inference is required, False otherwise
             auto_correct: Set to True in case automatic schema inference is required, False otherwise
-            List of dicts with transformer parameters such as
+            custom_tf: List of transformer instances
+            custom_params List of dicts with transformer parameters such as
                             {myStringDecimalTransformer.removeTokens: "'",
-                             myStringDecimalTransformer.decSplitStr: "."}}
+                             myStringDecimalTransformer.decSplitStr: "."}
         """
         super().__init__()
 
+        if custom_params is None:
+            custom_params = []
+        if custom_tf is None:
+            custom_tf = []
         self.auto_schema = auto_schema
         self.auto_correct = auto_correct
 
@@ -34,12 +37,12 @@ class PipelineBuilderLoad(PipelineBuilder):
 
         if self.auto_schema:
             # TODO: coordinate Transformers for schema inference, then add to custom_tf and custom_params
-            sdt = StringDecimalTransformer(inputCol = "_c0",
-                  outputCol = " _t0",
-                  removeTokens = ["'"],
-                  decSplitStr = ".",
-                  precision = 10,
-                  scale = 4)
+            sdt = StringDecimalTransformer(inputCol="_c0",
+                                           outputCol=" _t0",
+                                           removeTokens=["'"],
+                                           decSplitStr=".",
+                                           precision=10,
+                                           scale=4)
             if len(self.transformers) >= 1:
                 self.transformers.append(sdt)
             else:
@@ -59,5 +62,3 @@ class PipelineBuilderLoad(PipelineBuilder):
                 self.params.append("ParamsX")
             else:
                 self.params = "ParamsX"
-
-

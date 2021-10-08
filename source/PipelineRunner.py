@@ -2,7 +2,9 @@ from itertools import chain
 
 from pyspark.ml import Pipeline
 
-class PipelineRunner():
+
+class PipelineRunner:
+
     """
     Executes a SparkML pipeline created by a PipelineBuilder and records monitoring
     and execution parameters selected by the user (e.g., storing intermittent dataframes
@@ -12,15 +14,23 @@ class PipelineRunner():
     # TODO: Decide on logging calls to centralized here, in a logging component or ad-hoc in builders/transformers
 
     def __init__(self, spark_df, spark_session, pb_list):
+        """
+        Initiates a PipelineRunner based on an existing spark session and pipeline configurations
+
+        Args:
+            spark_df: Spark dataframe
+            spark_session: Spark session
+            pb_list: A list of PipelineBuilders of any type
+        """
         # TODO: Enable logging "spark.eventLog.enabled true" write to mondgodb with a time index
-        # TODO: Determine  runtime spark context settings, e.g, log level & location based on size/type of PipelineBuilders
+        # TODO: Runtime spark context configuration, e.g, log level & location based on size/type of PipelineBuilders
 
         self.pb_list = []
 
         # Only add non empty specified pipelines for execution
         for pipeline_builder in pb_list:
             if len(pipeline_builder.params) >= 1 and \
-                   len(pipeline_builder.transformers) >= 1:
+                    len(pipeline_builder.transformers) >= 1:
                 self.pb_list.append(pipeline_builder)
         if len(self.pb_list) == 0:
             raise ValueError("PipelineRunner: Cannot create pipeline runner from an empty PipelineBuilder")
@@ -30,7 +40,8 @@ class PipelineRunner():
 
         self.pipeline = self.stage(pb_list)
 
-    def extractTransformer(self, pb_list):
+    @staticmethod
+    def extract_transformer(pb_list):
         """
         Return a list of transformer instances form a PipelineBuilder
 
@@ -46,9 +57,10 @@ class PipelineRunner():
 
         return transformer_lists_items
 
-    def extractParams(self, pb_list):
+    @staticmethod
+    def extract_params(pb_list):
         """
-        Return a list of parameter dict form a PipelineBuilder
+        Return a list of parameter dicts form a PipelineBuilder
 
         Args:
             pb_list: A PipelineBuilder
@@ -72,7 +84,7 @@ class PipelineRunner():
 
         """
         pb_list.sort(key=lambda x: x.priority, reverse=True)
-        pipe_transformer = self.extractTransformer(pb_list)
+        pipe_transformer = self.extract_transformer(pb_list)
 
         return_pipe = Pipeline(stages=pipe_transformer)
 
@@ -87,6 +99,6 @@ class PipelineRunner():
 
         """
 
-        return_df = self.pipeline.fit(self.in_df, self.extractParams(self.pb_list)).transform(self.in_df)
+        return_df = self.pipeline.fit(self.in_df, self.extract_params(self.pb_list)).transform(self.in_df)
 
         return return_df
