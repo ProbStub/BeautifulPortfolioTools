@@ -1,6 +1,7 @@
 from itertools import chain
 
 from pyspark.ml import Pipeline
+from pyspark.sql import SparkSession
 
 
 class PipelineRunner:
@@ -72,7 +73,7 @@ class PipelineRunner:
         params_lists = list(o.params for o in pb_list)
         params_lists_items = list(chain(*params_lists))
 
-        # CRITICAL: TEST with multiple transformers in the PipelineBuilder to ensure element zero real holds all ditcs!!
+        # FIXME: Need to return ParaMap but of ALL pb_list not just the first, so chain is wrong here ;)
         return params_lists_items[0]
 
     def stage(self, pb_list):
@@ -102,3 +103,22 @@ class PipelineRunner:
         return_df = self.pipeline.fit(self.in_df, self.extract_params(self.pb_list)).transform(self.in_df)
 
         return return_df
+
+    def __start_spark__():
+        """
+            Initiates and configures spark session parameters:
+                - Enabling arrow for efficient pandas <-> spark dataframe conversion
+                - No executor CPU/memory ask to allow cluster auto-scale optimization
+
+            Args:
+                -
+            Returns:
+                Configured SparkSession
+            Raises:
+                -
+            """
+        spark = SparkSession.builder.appName("BPT-App-Std") \
+            .config("spark.sql.execution.arrow.pyspark.enabled", "true") \
+            .getOrCreate()
+
+        return spark
