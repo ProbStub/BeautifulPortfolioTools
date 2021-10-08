@@ -7,7 +7,6 @@ However, for the moment you need to perform these steps manually.
 > WARNING: Setup instructions may not be complete until CI/CD pipeline is
 > fully migrated to CircleCI
 
-
 ## Prerequisite setup
 This describes the general <b>local</b> environment setup (read: minikube)
 assuming you have no tooling what-so-ever.

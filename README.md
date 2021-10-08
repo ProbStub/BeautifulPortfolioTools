@@ -83,6 +83,3 @@ When processing large amounts of investment data that is advisable as well. When
 future returns on two separate markets you should be able to do that without waiting for the
 whole process of data load, forecasting, portfolio construction and output generation.
 All you want is the forecast.
-
-
-
