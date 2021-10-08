@@ -1,6 +1,5 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
-from pyspark.ml import Transformer
 from pyspark.ml.param import Param
 
 import CustomTransformers
