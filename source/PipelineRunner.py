@@ -71,7 +71,6 @@ class PipelineRunner:
 
         """
         params_lists = list(o.params for o in pb_list)
-        params_lists_dicts = list(chain(*params_lists))
         return_para_map = {}
         for pb in params_lists:
             for tf in pb:
@@ -107,6 +106,7 @@ class PipelineRunner:
 
         return return_df
 
+    @staticmethod
     def __start_spark__():
         """
             Initiates and configures spark session parameters:
