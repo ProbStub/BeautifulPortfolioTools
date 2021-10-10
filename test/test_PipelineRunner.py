@@ -14,38 +14,73 @@ class TestPipelineRunner:
         test_transform1 = CustomTransformers.TitleFoldTransformer(
             inputCol="aCol",
             outputCol="aCollOut",
-            capLength=3,
+            capLength=1,
             strSep=" ")
         test_params1 = test_transform1.extractParamMap()
         test_transform2 = CustomTransformers.TitleFoldTransformer(
             inputCol="bCol",
             outputCol="bColOut",
-            capLength=3,
+            capLength=2,
             strSep=" ")
         test_params2 = test_transform2.extractParamMap()
-        test_transform_list = [test_transform1, test_transform2]
-        test_params_list = [test_params1, test_params2]
-        self.test_pipe_build = PipelineBuilder(custom_tf=test_transform_list, custom_params=test_params_list)
+
+        test_transform3 = CustomTransformers.TitleFoldTransformer(
+            inputCol="xCol",
+            outputCol="xCollOut",
+            capLength=3,
+            strSep=" ")
+        test_params3 = test_transform3.extractParamMap()
+        test_transform4 = CustomTransformers.TitleFoldTransformer(
+            inputCol="yCol",
+            outputCol="yColOut",
+            capLength=4,
+            strSep=" ")
+        test_params4 = test_transform4.extractParamMap()
+
+        test_transform_list1 = [test_transform1, test_transform2]
+        test_transform_list2 = [test_transform3, test_transform4]
+        test_params_list1 = [test_params1, test_params2]
+        test_params_list2 = [test_params3, test_params4]
+        self.test_pipe_build1 = PipelineBuilder(custom_tf=test_transform_list1,
+                                                custom_params=test_params_list1,
+                                                priority=2)
+        self.test_pipe_build2 = PipelineBuilder(custom_tf=test_transform_list2,
+                                                custom_params=test_params_list2,
+                                                priority=1)
         self.test_runner = PipelineRunner(spark_df=self.test_df,
                                           spark_session=self.test_spark,
-                                          pb_list=[self.test_pipe_build])
+                                          pb_list=[self.test_pipe_build1, self.test_pipe_build1])
 
 
-    def test_extract_transformer(self):
+    def test_extract_transformer_two_pb(self):
         self.init()
-        test_result = self.test_runner.extract_transformer([self.test_pipe_build])
-        assert len(test_result) == 2 and \
+        test_result = self.test_runner.extract_transformer([self.test_pipe_build1, self.test_pipe_build2])
+        assert len(test_result) == 4 and \
                type(test_result) == list and \
                test_result[0].__class__.__base__.__name__ == "Transformer"
 
-    def test_extract_params(self):
+    def test_extract_params_one_pb(self):
         self.init()
-        test_result = self.test_runner.extract_params([self.test_pipe_build])
+        test_result = self.test_runner.extract_params([self.test_pipe_build1])
         assert len(test_result) == 8 and \
                type(test_result) == dict and \
-               all([type(k) is Param for k in test_result.keys()])
+               all([type(k) is Param for k in test_result])
 
-    def __start_spark__(self):
+    def test_extract_params_two_pb(self):
+        self.init()
+        test_result = self.test_runner.extract_params([self.test_pipe_build1, self.test_pipe_build2])
+        assert len(test_result) == 16 and \
+               type(test_result) == dict and \
+               all([type(k) is Param for k in test_result])
+
+    def test_stage(self):
+        self.init()
+
+    def test_execute(self):
+        self.init()
+
+    @staticmethod
+    def __start_spark__():
         """
             Initiates and configures spark session parameters:
                 - Enabling arrow for efficient pandas <-> spark dataframe conversion

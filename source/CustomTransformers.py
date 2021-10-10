@@ -6,6 +6,7 @@ from pyspark.ml import Transformer
 from pyspark.ml.param.shared import HasInputCol, HasOutputCol, Param
 
 
+# noinspection PyUnusedLocal,PyUnresolvedReferences
 class ValueMappingTransformer(Transformer, HasInputCol, HasOutputCol):
 
     """
@@ -26,7 +27,7 @@ class ValueMappingTransformer(Transformer, HasInputCol, HasOutputCol):
                              "A key string to value string dict, key is the value to be replaced with the value.")
         self._setDefault(mapDict={None: None})
 
-        # set the input keywork arguments
+        # set the input keyword arguments
         kwargs = self._input_kwargs
         self.setParams(**kwargs)
 
@@ -86,6 +87,7 @@ class ValueMappingTransformer(Transformer, HasInputCol, HasOutputCol):
         return self.getOrDefault(self.mapDict)
 
 
+# noinspection PyUnusedLocal,PyUnresolvedReferences
 class TitleFoldTransformer(Transformer, HasInputCol, HasOutputCol):
     """
     Converts capitalized strings to start letter capital/title-caps.
@@ -112,7 +114,7 @@ class TitleFoldTransformer(Transformer, HasInputCol, HasOutputCol):
                             "Single character String by which to separate multiple consecutive strings in inputCol.")
         self._setDefault(strSep="")
 
-        # set the input keywork arguments
+        # set the input keyword arguments
         kwargs = self._input_kwargs
         self.setParams(**kwargs)
 
@@ -169,7 +171,7 @@ class TitleFoldTransformer(Transformer, HasInputCol, HasOutputCol):
             in_value_list = in_value.split(str_sep)
             out_value = ""
 
-            # TODO: Needs good testing; var is only assigne dif if-statements completed as expected!!!
+            # TODO: Needs good testing; var is only assigned if if-statements completed as expected!!!
             for item in in_value_list:
                 done = False
                 if in_value_list[-1] == item:
@@ -220,6 +222,7 @@ class TitleFoldTransformer(Transformer, HasInputCol, HasOutputCol):
         return self.getOrDefault(self.strSep)
 
 
+# noinspection PyUnusedLocal,PyUnresolvedReferences
 class StringDecimalTransformer(Transformer, HasInputCol, HasOutputCol):
     """
     Converts string numbers into decimals and removing white space,
@@ -255,7 +258,7 @@ class StringDecimalTransformer(Transformer, HasInputCol, HasOutputCol):
                            "Int number of precision to after decimals, e.g. '1' in '0.1'. Defaults of DecimalType()")
         self._setDefault(scale=None)
 
-        # set the input keywork arguments
+        # set the input keyword arguments
         kwargs = self._input_kwargs
         self.setParams(**kwargs)
 
@@ -334,7 +337,7 @@ class StringDecimalTransformer(Transformer, HasInputCol, HasOutputCol):
         df = df.withColumn(out_col, trans_func_udf(df[in_col]))
 
         # Compute precision/scale for adequate decimal value conversion unless defined by user
-        # Note: This expects that the decSplitStr has been replaced by _numFormater with a "."!!!
+        # Note: This expects that the decSplitStr has been replaced by _num_formater with a "."!!!
         # TODO: Consider to simplify the query
         if self.getScale() is None or self.getPrecision() is None:
             pre_scl_df = df.select(df[out_col]) \
