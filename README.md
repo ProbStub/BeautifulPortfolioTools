@@ -71,7 +71,7 @@ Over the years I have seen many complex convoluted code or data structures. As a
 user I was more than once unable to use a nice tool because it seemed to have more options
 than a cat has hairs. I want to empower regular people to build investment portfolios
 for themselves. If not to implement for investment purpose but to challenge and verify
-advise and offers from professional advisors. The asymmetric information in investment
+advice and offers from professional advisors. The asymmetric information in investment
 advisory more often than not leads to an unhappy outcome.
 
 Long story short: One task at a time is far better to understand than multiple.
