@@ -79,7 +79,8 @@ class TestPipelineRunner:
     def test_execute(self):
         self.init()
 
-    def __start_spark__(self):
+    @staticmethod
+    def __start_spark__():
         """
             Initiates and configures spark session parameters:
                 - Enabling arrow for efficient pandas <-> spark dataframe conversion
