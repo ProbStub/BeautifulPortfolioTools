@@ -72,7 +72,10 @@ class PipelineRunner:
         """
         params_lists = list(o.params for o in pb_list)
         params_lists_dicts = list(chain(*params_lists))
-        return_para_map = {k: v for d in params_lists_dicts for k, v in d.items()}
+        return_para_map = {}
+        for pb in params_lists:
+            for tf in pb:
+                return_para_map = {**return_para_map, **tf}
 
         return return_para_map
 

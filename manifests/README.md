@@ -15,7 +15,7 @@ The steps may vary on your machine and are by no means complete.
 1. Install [Docker](https://www.docker.com) - You may as well create DockerHub account, although not strictly required
 2. Install [Homebrew](https://brew.sh) and check that ```.zprofile``` includes the brew shellenv:
 ```/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"```
-3. Install Python: ```brew install python3```
+3. Install Python (v3.9+): ```brew install python3```
 4. Install minikube: ```brew install minikube```
 5. Start minikube: ```minikube start```
 

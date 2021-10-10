@@ -18,6 +18,7 @@ def run():
 
     """
     # TODO: Add user parameter parsing and basic help output
+    # TODO: Split out task scripts such as: load.py, optimize.py, rebalance.py, estimate.py, trade.py, report.py, etc.
     print("Initiating...")
     load_dotenv()
 
