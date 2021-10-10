@@ -47,7 +47,7 @@ class PipelineRunner:
         Return a list of transformer instances form a PipelineBuilder
 
         Args:
-            pb_list: A PipelineBuilder
+            pb_list: A list of PipelineBuilder
 
         Returns:
             List of SparkML transformer instances
@@ -61,24 +61,26 @@ class PipelineRunner:
     @staticmethod
     def extract_params(pb_list):
         """
-        Return a list of parameter dicts form a PipelineBuilder
+        Return a dict of parameter (SparkML ParamMap) form a PipelineBuilder
 
         Args:
-            pb_list: A PipelineBuilder
+            pb_list: A list of PipelineBuilder
 
         Returns:
-            List of SparkML parameter dicts
+            Dict of SparkML parameters aka SparkML ParamMap
 
         """
         params_lists = list(o.params for o in pb_list)
-        params_lists_items = list(chain(*params_lists))
+        return_para_map = {}
+        for pb in params_lists:
+            for tf in pb:
+                return_para_map = {**return_para_map, **tf}
 
-        # FIXME: Need to return ParaMap but of ALL pb_list not just the first, so chain is wrong here ;)
-        return params_lists_items[0]
+        return return_para_map
 
     def stage(self, pb_list):
         """
-        Order pipeline builder by priority and build a Pipeline object
+        Order pipeline builder list by priority and build a Pipeline object
 
         Returns:
             A SparkML Pipeline with priority ordered transformer stages
@@ -104,6 +106,7 @@ class PipelineRunner:
 
         return return_df
 
+    @staticmethod
     def __start_spark__():
         """
             Initiates and configures spark session parameters:

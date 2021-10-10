@@ -14,7 +14,7 @@ command line flags and options (or eventually interactive UI).
 ## How to run
 Presently the refactoring is focused on the data load and portfolio construction logic.
 You will need access to Kubernetes (either local minikube or at your preferred cloud provider)
-to run PySpark and PostgreSQL. Other than that the following should get you started:
+to run PySpark (using Python v3.5 or later) and PostgreSQL. Other than that the following should get you started:
 
 0. (Optional) create a new conda environment by running ```conda create -n bpt_conda```
 1. Ensure all dependencies are installed ````pip install -r requirements.txt````
@@ -83,6 +83,3 @@ When processing large amounts of investment data that is advisable as well. When
 future returns on two separate markets you should be able to do that without waiting for the
 whole process of data load, forecasting, portfolio construction and output generation.
 All you want is the forecast.
-
-
-
