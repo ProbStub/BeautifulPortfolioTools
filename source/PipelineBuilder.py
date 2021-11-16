@@ -17,7 +17,7 @@ class PipelineBuilder:
 
         """
 
-        # TODO: Add facilities such as logging, error handling, parameter dict structure checks, priority etc.
+        # TODO: Add facilities, e.g., ogging, error handling, parameter structure checks, priority, model registry, etc.
         if custom_params is None:
             custom_params = []
         if custom_tf is None:
