@@ -34,7 +34,7 @@ The code is public for a reason, and if you like to contribute, please consider 
 
 Help with the following would be greatly appreciated:
 - Pretty much everything :-)
-- If you enjoy cloud devops a PR for a better [Dockerfile](manifest/Dockerfile) and integrating the container into
+- If you enjoy cloud devops a PR for a better [Dockerfile](manifests/Dockerfile) and integrating the container into
   the [CircleCI config.yml](.circleci/config.yml) would make a big difference
 - In the event that you love APIs feel free to donate a REST API to the mesh that can manage tools requests in order
   to abstract away the cloud deployment details currently preventing use for but the more technical users
