@@ -19,6 +19,9 @@ def run():
     """
     # TODO: Add user parameter parsing and basic help output
     # TODO: Split out task scripts such as: load.py, optimize.py, rebalance.py, estimate.py, trade.py, report.py, etc.
+    # TODO: set package versions in .ENV for configuration management
+    # TODO: discover proper python interpreter or set in .ENV for better multi-environment support:
+    #       os.environ["PYSPARK_PYTHON"] = os.system("which python3")
     print("Initiating...")
     load_dotenv()
 

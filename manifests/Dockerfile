@@ -1,10 +1,14 @@
 # CI host image for Beautiful Portfolio Tools - using brew to keep setup tooling synced between macOS & Ci Linux image
 # ubuntu because alpine continues to have old glibc with complicated upgrade path
-# NOTE: CircleCI presubable does a "-v /var/run/docker.sock:/var/run/docker.sock" when requesting "setup_remote_docker"
-#       for local runs the "-v..." option needs to be supplied to the "docker run" command for thid Dockerfile to work
-# WARNING: All Kubernetes workload images are generic and in no way security harded or performance optimized!
+#
+# NOTE
+# CircleCI presubable does a "-v /var/run/docker.sock:/var/run/docker.sock" when requesting "setup_remote_docker"
+# for local runs the "-v..." option needs to be supplied to the "docker run" command for thid Dockerfile to work
+#
+# WARNING
+# All Kubernetes workload images are generic and in no way security harded or performance optimized!
+# TODO: tie down to specific software versions on ubuntu and git clones
 
-# Docker -> kind -> Docker for pods
 FROM ubuntu:latest
 
 # Using ubuntu packages for system prerequisists only
@@ -60,19 +64,14 @@ RUN git clone https://github.com/zalando/postgres-operator.git
 RUN cd
 RUN git clone https://github.com/mongodb/mongodb-kubernetes-operator.git
 
-
-# TODO Complete production configuration and
-# - Install Spark Operator (https://operatorhub.io/operator/spark-gcp)
-# - Install Spinnaker Operator (https://operatorhub.io/operator/spinnaker-operator)
-# - Install Kafka Operator (https://operatorhub.io/operator/strimzi-kafka-operator)
-# - Retrieve exact package list from requirements.txt through CI environment parameters
-# - Post-CI container engineering/hardening remove unnecessary accounts and tools, e.g. more, grep, etc.
-
 # Run entrypoint script that depends on actual container id and network post image creation
 RUN cd
-RUN cd
+#RUN cd
 COPY entrypoint.sh .
 RUN sudo chown $(whoami) entrypoint.sh
 RUN sudo chmod +x entrypoint.sh
+COPY spark_minikube.yaml .
+RUN sudo chown $(whoami) spark_minikube.yaml
+RUN sudo chmod +x spark_minikube.yaml
 
 ENTRYPOINT ["./entrypoint.sh"]

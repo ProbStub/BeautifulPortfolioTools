@@ -6,11 +6,11 @@
 # WARNING
 # This is designed for development and integration testing only. Before production use consider the following:
 # - Review all container images software/package version, user account and network settings in containers
-# - Set app/version labels on all pods/services & workloads for ISTIO and to conform with your environment
-# - Define persistent volumes to match your environment
-# - Launch Spark Operator (https://operatorhub.io/operator/spark-gcp)
-# - Launch Spinnaker Operator (https://operatorhub.io/operator/spinnaker-operator)
-# - Launch Kafka Operator (https://operatorhub.io/operator/strimzi-kafka-operator)
+# - Set app/version labels on all pods/services & workloads for ISTIO and to conform with your environment policies
+# - Define persistent volumes to match your environment policies
+# - Remove unnecessary accounts and tools, e.g. more, grep, etc.
+# - Enable Spinnaker deployment support (https://github.com/armory/spinnaker-operator)
+# - Consider Kafka for model serving (https://operatorhub.io/operator/strimzi-kafka-operator)
 
 # START CircleCI/docker-in-docker specific
 sudo chgrp docker /var/run/docker.sock
@@ -140,6 +140,25 @@ export CONSTD=$(kubectl get secrets mongodb-admin-my-user -o=jsonpath='{.data.co
 export CONSRV=$(kubectl get secrets mongodb-admin-my-user -o=jsonpath='{.data.connectionString\.standardSrv}'|base64 -d)
 cd
 
+# Spark kubernetes controller configuration
+export LATEST_SPARK=$(ls -t ".linuxbrew/Cellar/apache-spark/" | head -n 1)
+cd .linuxbrew/Cellar/apache-spark/$LATEST_SPARK/libexec
+docker-image-tool.sh -b platform=linux/amd64 -n -t spark -p kubernetes/dockerfiles/spark/bindings/python/Dockerfile build
+cd
+kind load docker-image spark-py:spark --name $CLUSTER_NAME
+kubectl create serviceaccount spark
+kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
+#kubectl apply -f spark.yaml
+# TODO: make master URL accessible from host, open port 6443 on 0.0.0.0???
+spark-submit --master k8s://https://172.18.0.2:6443 \
+--deploy-mode cluster \
+--name spark-pi \
+--class org.apache.spark.examples.SparkPi \
+--conf spark.executor.instances=2 \
+--conf spark.kubernetes.container.image=spark-py:spark  \
+--conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
+local:///opt/spark/examples/jars/spark-examples_2.12-3.2.0.jar 1000
+
 # START CircleCI/docker-in-docker specific
 kubectl port-forward svc/kiali --address=0.0.0.0 20001 -n istio-system &
 kubectl port-forward svc/grafana --address=0.0.0.0 3000 -n istio-system &
@@ -150,6 +169,7 @@ kubectl port-forward svc/postgres-operator-ui --address=0.0.0.0 8081:80 &
 sleep 3
 echo "#####################################################################################################################"
 echo "Session database password (postgres and mongodb) is: $PGPWD"
-echo "Note: The container is ephemeral. Passwords will change after restart!"
+echo "Note: The container is ephemeral. Passwords WILL CHANGE after restart!"
+echo "WARNING: Data will be ERASED upon restart. Data is NOT PERSISTED in the integration environment!"
 echo "#####################################################################################################################"
 bash
