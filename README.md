@@ -18,7 +18,7 @@ to run PySpark (using Python v3.5 or later) and PostgreSQL. Other than that the 
 
 0. (Optional) create a new conda environment by running ```conda create -n bpt_conda```
 1. Ensure all dependencies are installed ````pip install -r requirements.txt````
-2. PySpark needs to be installed locally for code to execute
+2. PySpark, Postgres & MongoDB needs to be installed locally for code to execute
 3. Insert your database, cloud and API secrets into the ```.env``` file
 4. Run each tool with a separate python call such as
     ````python source/main.py```` where "main" can be replaced with any of the tools
@@ -31,6 +31,16 @@ which walks through some steps in more details (but is presently work in progres
 The code is public for a reason, and if you like to contribute, please consider to:
 - Provide test_* files for your contribution
 - Ensure that linting completes without issues
+
+Help with the following would be greatly appreciated:
+- Pretty much everything :-)
+- If you enjoy cloud devops a PR for a better [Dockerfile](manifests/Dockerfile) and integrating the container into
+  the [CircleCI config.yml](.circleci/config.yml) would make a big difference
+- In the event that you love APIs feel free to donate a REST API to the mesh that can manage tools requests in order
+  to abstract away the cloud deployment details currently preventing use for but the more technical users
+- Should you be a Spark hero I would welcome help with Spark native
+  [covariance implementation into PyPortfolioOpt](https://github.com/robertmartin8/PyPortfolioOpt/issues/381) because
+  unfortunately the covariance matrix did not make it into Pandas API port of Spark 3.2.0
 
 To set up your development environment after cloning the repo please perform the following preparation steps:
 1. Pre-Commit hooks have been established so please run ````pre-commit install````
