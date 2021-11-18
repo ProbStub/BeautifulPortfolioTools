@@ -50,11 +50,18 @@ ENV CLUSTER_NAME=bpt-ci-cluster
 ENV CLUSTER_CONTROL_PLANE=$CLUSTER_NAME"-control-plane"
 
 # Installing Python & PySpark requirements
+RUN sudo apt remove -y python3.8
 RUN brew install python3
+RUN sudo rm /bin/python3
+RUN sudo ln -s /home/linuxbrew/.linuxbrew/bin/python3.9 /bin/python3
 # Do NOT "pip3 install pyspark" as it unsettles the JAVA environment for spark
 # TODO: retrieve exact package list from requirements.txt through CI environment parameters
-RUN pip3 install pandas pyarrow
+RUN pip3 install pandas pyarrow findspark
 RUN brew install apache-spark
+
+# Install metrics-server
+RUN cd
+RUN git clone https://github.com/kubernetes-incubator/metrics-server.git
 
 # Install Postgres operator
 RUN cd
@@ -70,8 +77,5 @@ RUN cd
 COPY entrypoint.sh .
 RUN sudo chown $(whoami) entrypoint.sh
 RUN sudo chmod +x entrypoint.sh
-COPY spark_minikube.yaml .
-RUN sudo chown $(whoami) spark_minikube.yaml
-RUN sudo chmod +x spark_minikube.yaml
 
 ENTRYPOINT ["./entrypoint.sh"]

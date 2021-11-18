@@ -55,6 +55,17 @@ do
   sleep 1;
   done;
 echo "] DONE!"
+# Adding the kube-system metrics server configuration
+cd
+
+#sed -i -e 's/- --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname/- --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname\
+#          - --kubelet-insecure-tls/' metrics-server/manifests/base/deployment.yaml
+
+sed -i -e 's/kubelet-use-node-status-port/kubelet-insecure-tls/' metrics-server/manifests/base/deployment.yaml
+#sed -i -e 's/periodSeconds: 10/periodSeconds: 30/' metrics-server/manifests/base/deployment.yaml
+kubectl apply -k metrics-server/manifests/release/
+
+
 
 # Postgres operator configuration
 cd postgres-operator/
@@ -150,14 +161,14 @@ kubectl create serviceaccount spark
 kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
 #kubectl apply -f spark.yaml
 # TODO: make master URL accessible from host, open port 6443 on 0.0.0.0???
-spark-submit --master k8s://https://172.18.0.2:6443 \
---deploy-mode cluster \
---name spark-pi \
---class org.apache.spark.examples.SparkPi \
---conf spark.executor.instances=2 \
---conf spark.kubernetes.container.image=spark-py:spark  \
---conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
-local:///opt/spark/examples/jars/spark-examples_2.12-3.2.0.jar 1000
+#spark-submit --master k8s://https://172.18.0.2:6443 \
+#--deploy-mode cluster \
+#--name spark-pi \
+#--class org.apache.spark.examples.SparkPi \
+#--conf spark.executor.instances=2 \
+#--conf spark.kubernetes.container.image=spark-py:spark  \
+#--conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
+#local:///opt/spark/examples/jars/spark-examples_2.12-3.2.0.jar 1000
 
 # START CircleCI/docker-in-docker specific
 kubectl port-forward svc/kiali --address=0.0.0.0 20001 -n istio-system &
