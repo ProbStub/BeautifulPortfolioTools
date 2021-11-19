@@ -71,6 +71,10 @@ RUN git clone https://github.com/zalando/postgres-operator.git
 RUN cd
 RUN git clone https://github.com/mongodb/mongodb-kubernetes-operator.git
 
+# Install Spark operator
+RUN CD
+RUN git clone https://github.com/GoogleCloudPlatform/spark-on-k8s-operator.git
+
 # Run entrypoint script that depends on actual container id and network post image creation
 RUN cd
 #RUN cd

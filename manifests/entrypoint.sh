@@ -151,16 +151,33 @@ export CONSTD=$(kubectl get secrets mongodb-admin-my-user -o=jsonpath='{.data.co
 export CONSRV=$(kubectl get secrets mongodb-admin-my-user -o=jsonpath='{.data.connectionString\.standardSrv}'|base64 -d)
 cd
 
-# Spark kubernetes controller configuration
+# Spark kubernetes operator configuration
 export LATEST_SPARK=$(ls -t ".linuxbrew/Cellar/apache-spark/" | head -n 1)
 cd .linuxbrew/Cellar/apache-spark/$LATEST_SPARK/libexec
 docker-image-tool.sh -b platform=linux/amd64 -n -t spark -p kubernetes/dockerfiles/spark/bindings/python/Dockerfile build
 cd
 kind load docker-image spark-py:spark --name $CLUSTER_NAME
-kubectl create serviceaccount spark
-kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
-#kubectl apply -f spark.yaml
-# TODO: make master URL accessible from host, open port 6443 on 0.0.0.0???
+sed -i -e 's/^  labels:/  labels:\
+    app: sparkoperator\
+    version: 3.1.1/' spark-on-k8s-operator/manifest/spark-operator-install/spark-operator.yaml
+sed -i -e 's/^      labels:/      labels:\
+        app: sparkoperator\
+        version: 3.1.1/' spark-on-k8s-operator/manifest/spark-operator-install/spark-operator.yaml
+# Launching Spark operator instance
+kubectl apply -f spark-on-k8s-operator/manifest/crds/
+kubectl apply -f spark-on-k8s-operator/manifest/spark-application-rbac/
+kubectl apply -f spark-on-k8s-operator/manifest/spark-operator-install/
+
+# 3.1.1 operator run with spark 3.2.0 image:
+#sed -i -e 's/gcr.io\/spark-operator\/spark-py:v3.1.1/spark-py:spark/' spark-on-k8s-operator/examples/spark-py-pi.yaml
+#sed -i -e 's/3.1.1/3.2.0/' spark-on-k8s-operator/examples/spark-py-pi.yaml
+#sed -i -e 's/imagePullPolicy: Always/imagePullPolicy: Never/' spark-on-k8s-operator/examples/spark-py-pi.yaml
+#kubectl apply -f spark-on-k8s-operator/examples/spark-py-pi.yaml
+#kubectl get sparkapplications pyspark-pi -o=yaml
+
+# Client run:
+#kubectl create serviceaccount spark
+#kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
 #spark-submit --master k8s://https://172.18.0.2:6443 \
 #--deploy-mode cluster \
 #--name spark-pi \
@@ -171,6 +188,7 @@ kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount
 #local:///opt/spark/examples/jars/spark-examples_2.12-3.2.0.jar 1000
 
 # START CircleCI/docker-in-docker specific
+# TODO: Operator UI port-forwards
 kubectl port-forward svc/kiali --address=0.0.0.0 20001 -n istio-system &
 kubectl port-forward svc/grafana --address=0.0.0.0 3000 -n istio-system &
 kubectl port-forward svc/istio-ingressgateway --address=0.0.0.0 80 -n istio-system &
