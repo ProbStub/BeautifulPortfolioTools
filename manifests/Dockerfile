@@ -13,7 +13,7 @@ FROM ubuntu:latest
 
 # Using ubuntu packages for system prerequisists only
 RUN apt update
-RUN apt install -y curl ruby git ca-certificates grep build-essential sudo lsb-release gnupg iputils-ping net-tools
+RUN apt install -y curl ruby git ca-certificates grep build-essential sudo lsb-release gnupg iputils-ping net-tools bash-completion
 
 # Fetch and install docker container engine
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
@@ -81,5 +81,8 @@ RUN cd
 COPY entrypoint.sh .
 RUN sudo chown $(whoami) entrypoint.sh
 RUN sudo chmod +x entrypoint.sh
+
+COPY executor-pod-template.yaml .
+RUN sudo chown $(whoami) executor-pod-template.yaml
 
 ENTRYPOINT ["./entrypoint.sh"]

@@ -29,6 +29,10 @@ export MASTER_NET=$(docker inspect --format='{{range .NetworkSettings.Networks}}
 docker network connect $MASTER_NET $HOSTNAME
 # END CircleCI/docker-in-docker specific
 
+# Start kubernetes dashboard ui
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.4.0/aio/deploy/recommended.yaml
+kubectl proxy --address=0.0.0.0
+
 # ISTIO main and service add-on components startup
 $(ls|grep istio)/bin/istioctl install -y
 kubectl label namespace default istio-injection=enabled
@@ -175,7 +179,7 @@ kubectl apply -f spark-on-k8s-operator/manifest/spark-operator-install/
 #kubectl apply -f spark-on-k8s-operator/examples/spark-py-pi.yaml
 #kubectl get sparkapplications pyspark-pi -o=yaml
 
-# Client run:
+# Submit cluster run:
 #kubectl create serviceaccount spark
 #kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
 #spark-submit --master k8s://https://172.18.0.2:6443 \
@@ -187,14 +191,34 @@ kubectl apply -f spark-on-k8s-operator/manifest/spark-operator-install/
 #--conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
 #local:///opt/spark/examples/jars/spark-examples_2.12-3.2.0.jar 1000
 
+# Submit client run:
+#kubectl create serviceaccount spark
+#kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
+#spark-submit --master k8s://https://172.18.0.2:6443 \
+#--deploy-mode client \
+#--name spark-pi \
+#--class org.apache.spark.examples.SparkPi \
+#--conf spark.executor.instances=1 \
+#--conf spark.kubernetes.container.image=spark-py:spark  \
+#--conf spark.driver.bindAddress=172.18.0.3 \
+#--conf spark.driver.host=172.18.0.3 \
+#--conf spark.kubernetes.executor.podTemplateFile=/home/linuxbrew/executor-pod-template.yaml \
+#--conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
+#file:///home/linuxbrew/.linuxbrew/Cellar/apache-spark/3.2.0/libexec/examples/jars/spark-examples_2.12-3.2.0.jar 1000
+
 # START CircleCI/docker-in-docker specific
 # TODO: Operator UI port-forwards
+kubectl port-forward svc/kubernetes-dashboard --address=0.0.0.0 8001 -n kubernetes-dashboard &
 kubectl port-forward svc/kiali --address=0.0.0.0 20001 -n istio-system &
 kubectl port-forward svc/grafana --address=0.0.0.0 3000 -n istio-system &
 kubectl port-forward svc/istio-ingressgateway --address=0.0.0.0 80 -n istio-system &
 kubectl port-forward svc/istio-ingressgateway --address=0.0.0.0 443 -n istio-system &
 kubectl port-forward svc/postgres-operator-ui --address=0.0.0.0 8081:80 &
 # END CircleCI/docker-in-Docker specific
+
+# Enable kubctl bash completion on docker image for debugging
+cd
+echo "source <(kubectl completion bash)" >> ~/.bashrc
 sleep 3
 echo "#####################################################################################################################"
 echo "Session database password (postgres and mongodb) is: $PGPWD"
